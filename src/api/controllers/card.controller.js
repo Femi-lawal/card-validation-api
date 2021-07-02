@@ -1,29 +1,28 @@
 import utils from '../../utils';
-import services from '../services';
-const { cardIssuer, cvv2Validator, emailValidator, expiryDateValidator, lunhValidator, phoneNumberValidator } =
-	services;
+import Validator from '../services';
 const { errorCodesGenerator, utilityResponse } = utils;
+class CardController {
+	static validatePayment = (req, res) => {
+		try {
+			const { creditCardNumber, expirationDate, cvv2, email, mobile, phoneNumber, isXml } = req.body;
+			const cardNumber = creditCardNumber.replace(/\s/g, '');
+			let errorCodes = [];
+			const validator = new Validator(cardNumber, expirationDate, cvv2, email, mobile, phoneNumber);
+			const isCard = validator.isCard;
+			const issuer = validator.issuer;
+			const hasExpired = validator.hasExpired;
+			const validEmail = validator.validEmail;
+			const validCvv = validator.validCvv;
+			const validPhoneNumber = validator.validPhoneNumber;
+			const data = { issuer };
+			errorCodes = errorCodesGenerator({ isCard, issuer, hasExpired, validEmail, validCvv, validPhoneNumber });
 
-const validatePayment = (req, res) => {
-	try {
-		console.log(req.body);
-		const { creditCardNumber, expirationDate, cvv2, email, mobile, phoneNumber, isXml } = req.body;
-		const cardNumber = creditCardNumber.replace(/\s/g, '');
-		let errorCodes = [];
-		const isCard = lunhValidator(cardNumber);
-		const issuer = cardIssuer(cardNumber);
-		const hasExpired = expiryDateValidator(expirationDate);
-		const validEmail = emailValidator(email);
-		const validCvv = cvv2Validator(cvv2, issuer);
-		const validPhoneNumber = phoneNumberValidator(phoneNumber);
-		const data = { issuer };
-		errorCodes = errorCodesGenerator({ isCard, issuer, hasExpired, validEmail, validCvv, validPhoneNumber });
+			return utilityResponse({ errorCodes, data, res, isXml });
+		} catch (error) {
+			console.log(error);
+			return utilityResponse({ errorCodes: error.message, res, statusCode: 500 });
+		}
+	};
+}
 
-		return utilityResponse({ errorCodes, data: { issuer }, res, isXml });
-	} catch (error) {
-		console.log(error);
-		return utilityResponse({ errorCodes: error.message, res, statusCode: 500 });
-	}
-};
-
-export { validatePayment };
+export default CardController;

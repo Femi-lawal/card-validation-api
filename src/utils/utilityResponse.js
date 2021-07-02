@@ -8,7 +8,6 @@ const utilityResponse = ({ res, data = {}, isXml = false, errorCodes, statusCode
 		errorCodes,
 	};
 	if (responseObject.valid) {
-		console.log('here');
 		responseObject.issuer = data.issuer;
 	}
 	if (isXml) {

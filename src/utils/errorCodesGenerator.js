@@ -1,6 +1,5 @@
 export default ({ isCard, issuer, hasExpired, validEmail, validCvv, validPhoneNumber }) => {
 	const errorCodes = [];
-	console.log(issuer);
 	if (!isCard) {
 		errorCodes.push('creditCardNumber: The card number is invalid');
 	}

@@ -8,14 +8,13 @@ export default expiration => {
 	const today = new Date();
 	const currentMonth = today.getMonth() + 1;
 	const currentYear = today.getFullYear() % 100;
-	const lowerYear = currentYear < expirationYear;
+	const higherYear = currentYear < expirationYear;
 	const sameYear = currentYear === expirationYear;
-	const lowerMonth = currentMonth > expirationMonth;
-	console.log({ expirationMonth, expirationYear, currentMonth, currentYear });
-	if (lowerYear) {
+	const higherMonth = currentMonth < expirationMonth;
+	if (higherYear) {
 		return [true];
 	}
-	if (sameYear && lowerMonth) {
+	if (sameYear && higherMonth) {
 		return [true];
 	}
 	return [false, 'The card has expired'];
