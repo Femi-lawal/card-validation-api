@@ -1,27 +1,28 @@
-export default card => {
-	const expression = new RegExp('^[0-9]{13,19}$');
-	if (!expression.test(card)) {
-		return false;
-	}
+export default (card = '') => {
+    // Validate input type and format
+    if (typeof card !== 'string' || !/^[0-9]{13,19}$/.test(card)) {
+        return false;
+    }
 
-	return luhnAlgorithm(card);
+    return calculateLuhnChecksum(card);
 };
 
-const luhnAlgorithm = card => {
-	let lastIndex = card.length - 1;
+const calculateLuhnChecksum = card => {
+    let checkSum = 0;
+    let doubleDigit = false;
 
-	let checkSum = 0;
-	let isFirst = true;
-	for (lastIndex; lastIndex >= 0; lastIndex--) {
-		let digit = card[lastIndex].charCodeAt() - '0'.charCodeAt();
+    for (let i = card.length - 1; i >= 0; i--) {
+        let digit = parseInt(card[i], 10);
 
-		if (isFirst === false) {
-			digit = digit * 2;
-		}
-		checkSum += parseInt(digit / 10, 10);
-		checkSum += digit % 10;
+        // Double every second digit
+        if (doubleDigit) {
+            digit *= 2;
+            if (digit > 9) digit -= 9; // Adjust for digits over 9
+        }
 
-		isFirst = !isFirst;
-	}
-	return checkSum % 10 === 0;
+        checkSum += digit;
+        doubleDigit = !doubleDigit; // Toggle the flag
+    }
+
+    return checkSum % 10 === 0;
 };
