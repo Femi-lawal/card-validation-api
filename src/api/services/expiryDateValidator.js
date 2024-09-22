@@ -9,7 +9,7 @@ export default (expiration = '') => {
     const expirationYear = parseInt(yearStr, 10);
 
     // Validate parsed values
-    if (isNaN(expirationMonth) || isNaN(expirationYear) || expirationMonth < 1 || expirationMonth > 12) {
+    if (Number.isNaN(expirationMonth) || Number.isNaN(expirationYear) || expirationMonth < 1 || expirationMonth > 12) {
         return [false, 'Invalid month or year in expiration date'];
     }
 
