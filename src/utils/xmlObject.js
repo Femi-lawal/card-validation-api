@@ -1,8 +1,23 @@
-import { response } from 'express';
 import { toXml } from 'xml2json';
 
-export default jsonObject => {
-	const newObject = { root: { valid: { value: jsonObject.valid }, errorCodes: { value: jsonObject.errorCodes } } };
-	const response = toXml(newObject);
-	return response;
+export default (jsonObject) => {
+    try {
+        // Create a properly structured object for XML conversion
+        const newObject = {
+            root: {
+                valid: jsonObject.valid,
+                errorCodes: {
+                    code: jsonObject.errorCodes // Assumes errorCodes is an array of strings
+                }
+            }
+        };
+
+        // Convert to XML format
+        const xmlResponse = toXml(newObject);
+
+        return xmlResponse;
+    } catch (error) {
+        console.error('Error converting JSON to XML:', error);
+        throw new Error('Conversion failed. Please check the JSON format.');
+    }
 };
