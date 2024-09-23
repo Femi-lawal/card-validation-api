@@ -20,7 +20,10 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(parseBody);
-app.use(xmlparser());
+app.use(xmlparser({
+    trim: true,
+    explicitArray: false, // Ensures elements are not wrapped in arrays
+}));
 
 // Check if request is authorized
 app.use(authorize);
