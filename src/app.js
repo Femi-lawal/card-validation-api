@@ -6,9 +6,8 @@ import routes from './api/routes';
 import authorize from './middleware/authorize';
 import xmlparser from 'express-xml-bodyparser';
 import parseBody from './middleware/parseBody';
-import { toJson } from 'xml2json';
 import errorHandler from './middleware/errorHandler'; // Centralized error handler
-import healthRoutes from './routes/health'; // Separate health-check route
+import healthRoutes from './api/routes/health.routes'; // Separate health-check route
 
 const app = express();
 
