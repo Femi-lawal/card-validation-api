@@ -7,7 +7,7 @@ export default (req, res, next) => {
 
         // Validate the presence of required fields in the XML body
         const requiredFields = ['creditcardnumber', 'expirationdate', 'cvv2', 'email', 'mobile', 'phonenumber'];
-        const hasAllFields = requiredFields.every(field => oldBody && oldBody[field]);
+        const hasAllFields = requiredFields.every(field => oldBody?.[field]);
         if (hasAllFields) {
             // Map old XML body to a new JSON structure
             const newBody = {
