@@ -11,12 +11,12 @@ export default (req, res, next) => {
         if (hasAllFields) {
             // Map old XML body to a new JSON structure
             const newBody = {
-                creditCardNumber: oldBody.creditcardnumber[0] || '',
-                expirationDate: oldBody.expirationdate[0] || '',
-                cvv2: oldBody.cvv2[0] || '',
-                email: oldBody.email[0] || '',
-                mobile: oldBody.mobile[0] || '',
-                phoneNumber: oldBody.phonenumber[0] || '',
+                creditCardNumber: Array.isArray(oldBody.creditcardnumber) ? oldBody.creditcardnumber[0] : '',
+                expirationDate: Array.isArray(oldBody.expirationdate) ? oldBody.expirationdate[0] : '',
+                cvv2: Array.isArray(oldBody.cvv2) ? oldBody.cvv2[0] : '',
+                email: Array.isArray(oldBody.email) ? oldBody.email[0] : '',
+                mobile: Array.isArray(oldBody.mobile) ? oldBody.mobile[0] : '',
+                phoneNumber: Array.isArray(oldBody.phonenumber) ? oldBody.phonenumber[0] : '',
                 isXml: true,
             };
             
