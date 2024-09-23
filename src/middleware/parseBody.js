@@ -1,5 +1,5 @@
 export default (req, res, next) => {
-    const contentType = req.header('Content-Type') || '';
+    const contentType = req.get('Content-Type') || '';
 
     // Check if the content type is XML
     if (/xml$/i.test(contentType)) {
@@ -34,11 +34,6 @@ export default (req, res, next) => {
         newBody.isXml = true;
 
         req.body = newBody; // Assign the new structured body
-    } else {
-        return res.status(400).json({
-            error: 'Invalid Content-Type',
-            message: `Expected 'Content-Type' header to end with 'xml', but got '${contentType}' instead.`
-        });
     }
 
     next(); // Proceed to the next middleware

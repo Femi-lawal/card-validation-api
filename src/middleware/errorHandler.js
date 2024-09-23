@@ -1,12 +1,12 @@
-const errorHandler = (err, req, res, next) => {
-    console.error(err.stack); // Log error stack for debugging
+import logger from '../utils/logger';
 
-    // Send a response to the client
-    res.status(500).json({
-        success: false,
-        message: 'An unexpected error occurred. Please try again later.',
-        error: process.env.NODE_ENV === 'development' ? err.message : undefined, // Show error details only in development
-    });
+const errorHandler = (err, req, res, next) => {
+  logger.error(err.stack); // Logs error stack
+  res.status(500).json({
+    success: false,
+    message: 'An unexpected error occurred. Please try again later.',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined,
+  });
 };
 
 export default errorHandler;
