@@ -5,7 +5,6 @@ import morgan from 'morgan';
 import routes from './api/routes';
 import authorize from './middleware/authorize';
 import xmlparser from 'express-xml-bodyparser';
-import parseBody from './middleware/parseBody';
 import errorHandler from './middleware/errorHandler'; // Centralized error handler
 import healthRoutes from './api/routes/health.routes'; // Separate health-check route
 
@@ -19,7 +18,6 @@ if (process.env.NODE_ENV === 'development') {
 // Body parser, reading data from body into req.body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(parseBody);
 app.use(xmlparser({
     trim: true,
     explicitArray: false, // Ensures elements are not wrapped in arrays
