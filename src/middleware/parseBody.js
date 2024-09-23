@@ -10,15 +10,21 @@ export default (req, res, next) => {
         const hasAllFields = requiredFields.every(field => oldBody?.[field]);
         if (hasAllFields) {
             // Map old XML body to a new JSON structure
-            const newBody = {
-                creditCardNumber: Array.isArray(oldBody.creditcardnumber) ? oldBody.creditcardnumber[0] : '',
-                expirationDate: Array.isArray(oldBody.expirationdate) ? oldBody.expirationdate[0] : '',
-                cvv2: Array.isArray(oldBody.cvv2) ? oldBody.cvv2[0] : '',
-                email: Array.isArray(oldBody.email) ? oldBody.email[0] : '',
-                mobile: Array.isArray(oldBody.mobile) ? oldBody.mobile[0] : '',
-                phoneNumber: Array.isArray(oldBody.phonenumber) ? oldBody.phonenumber[0] : '',
-                isXml: true,
+            // Map old XML body to a new JSON structure dynamically
+            const fieldMappings = {
+                creditcardnumber: 'creditCardNumber',
+                expirationdate: 'expirationDate',
+                cvv2: 'cvv2',
+                email: 'email',
+                mobile: 'mobile',
+                phonenumber: 'phoneNumber',
             };
+
+            const newBody = {};
+            for (const [oldKey, newKey] of Object.entries(fieldMappings)) {
+                newBody[newKey] = Array.isArray(oldBody[oldKey]) ? oldBody[oldKey][0] : '';
+            }
+            newBody.isXml = true;
             
             req.body = newBody; // Assign the new structured body
         } else {
