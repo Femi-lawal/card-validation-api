@@ -5,32 +5,39 @@ import morgan from 'morgan';
 import routes from './api/routes';
 import authorize from './middleware/authorize';
 import xmlparser from 'express-xml-bodyparser';
-import { toJson } from 'xml2json';
+import errorHandler from './middleware/errorHandler'; // Centralized error handler
+import healthRoutes from './api/routes/health.routes'; // Separate health-check route
 
 const app = express();
 
-if (process.env.NODE_ENV === 'development') {
-	app.use(morgan('dev'));
+// Use morgan only in development
+if (process.env.ENABLE_LOGGING === 'true') {
+    app.use(morgan('dev'));
 }
-
-// Check if request is authorized
-app.use(authorize);
 
 // Body parser, reading data from body into req.body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(xmlparser());
+app.use(xmlparser({
+    trim: true,
+    explicitArray: false, // Ensures elements are not wrapped in arrays
+}));
 
-// when a random route is inputed
-app.get('/health-check', (req, res) =>
-	res.status(200).send({
-		message: 'API is running',
-	})
-);
+// Check if request is authorized
+app.use(authorize);
 
+// Health-check route
+// Health-check route for monitoring and load balancing
+app.use('/health-check', healthRoutes);
+
+// API routes
 app.use('/api', routes);
 
-// to handle 404 errors
+// Handle 404 errors
 app.use((_req, res) => res.status(404).send({ error: 'Page not found' }));
+
+// Centralized error handling middleware
+// Centralized error handling middleware (should be last in the middleware stack)
+app.use(errorHandler);
 
 export default app;

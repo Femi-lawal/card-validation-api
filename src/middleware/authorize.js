@@ -1,9 +1,16 @@
 export default (req, res, next) => {
-	if (req.headers.token === process.env.ACCESS_TOKEN && req.headers.client === process.env.CLIENT) {
-		// user is authorized
-		next();
-	} else {
-		// return unauthorized
-		res.status(401).json({ error: 'You are not Authorized' });
-	}
+    const { token, client } = req.headers;
+
+    // Normalize and validate headers
+    if (!token || !client) {
+        return res.status(400).json({ error: 'Missing authorization headers' });
+    }
+
+    if (token.trim() === process.env.ACCESS_TOKEN && client.trim() === process.env.CLIENT) {
+        // User is authorized
+        next();
+    } else {
+        // Return unauthorized with specific message
+        res.status(401).json({ error: 'Invalid token or client' });
+    }
 };
