@@ -1,74 +1,76 @@
 import parseBody from '../../src/middleware/parseBody';
 import { jest } from '@jest/globals';
 
-describe('parseBody Middleware', () => {
-  let req, res, next;
+describe('Body Parser Middleware', () => {
+    let req, res, next;
 
-  beforeEach(() => {
-    req = {
-      headers: {'Content-Type': 'application/xml'}, // Corrected to mock req.headers
-      get: jest.fn().mockReturnValue(''), // Corrected to mock req.get
-      body: {}
-    };
-    res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn()
-    };
-    next = jest.fn();
-  });
-
-  test('should correctly parse XML body to JSON', () => {
-    req.get.mockReturnValue('application/xml');
-    req.body = `
-      <?xml version="1.0" encoding="UTF-8"?>
-      <root>
-        <creditCardNumber>5500 0000 0000 0004</creditCardNumber>
-        <cvv2>123</cvv2>
-        <email>test@example.com</email>
-        <expirationDate>12/34</expirationDate>
-        <mobile>08123456789</mobile>
-        <phoneNumber>+2348123456789</phoneNumber>
-      </root>    
-    `;
-
-    parseBody(req, res, next);
-
-    expect(req.body).toEqual({
-      creditCardNumber: '5500 0000 0000 000',
-      expirationDate: '12/34',
-      cvv2: '123',
-      email: 'test@example.com',
-      mobile: '08123456789',
-      phoneNumber: '+2348123456789',
-      isXml: true
+    beforeEach(() => {
+        req = {
+            get: jest.fn(),
+            body: {}
+        };
+        res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        next = jest.fn();
     });
-    expect(next).toHaveBeenCalled();
-  });
 
-  test('should return error for invalid XML structure', () => {
-    req.get.mockReturnValue('application/xml');
-    req.body = `
-      <?xml version="1.0" encoding="UTF-8"?>
-      <root>
-        <creditCardNumber>5500 0000 0000 0004</creditCardNumber>
-        <cvv2>123</cvv2>
-      </root>
-    `;
+    test('should correctly map and transform the XML body to the expected JSON format', () => {
+        req.get.mockReturnValue('application/xml');
+        req.body = {
+            root: {
+                creditcardnumber: '1234567890123456',
+                expirationdate: '12/34',
+                cvv2: '123',
+                email: 'test@example.com',
+                mobile: '08123456789',
+                phonenumber: '+2348123456789'
+            }
+        };
 
-    parseBody(req, res, next);
+        parseBody(req, res, next);
 
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({
-      error: 'Invalid XML structure',
-      message: expect.stringContaining('The following required fields are missing')
+        expect(req.body).toEqual({
+            creditCardNumber: '1234567890123456',
+            expirationDate: '12/34',
+            cvv2: '123',
+            email: 'test@example.com',
+            mobile: '08123456789',
+            phoneNumber: '+2348123456789',
+            isXml: true
+        });
+        expect(next).toHaveBeenCalled();
     });
-  });
 
-  test('should skip parsing if content type is not XML', () => {
-    req.get.mockReturnValue('application/json');
-    parseBody(req, res, next);
+    test('should return an error if required fields are missing in the XML body', () => {
+        req.get.mockReturnValue('application/xml');
+        req.body = {
+            root: {
+                creditcardnumber: '1234567890123456'
+                // Missing other required fields
+            }
+        };
 
-    expect(req.body).toEqual({});
-    expect(next).toHaveBeenCalled();
-  });
+        parseBody(req, res, next);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({
+            error: 'Invalid XML structure',
+            message: 'The following required fields are missing: expirationdate, cvv2, email, mobile, phonenumber. Please ensure all required fields are provided.'
+        });
+        expect(next).not.toHaveBeenCalled();
+    });
+
+    test('should proceed to next middleware if Content-Type is not XML', () => {
+        req.get.mockReturnValue('application/json');
+        req.body = {
+            key: 'value'
+        };
+
+        parseBody(req, res, next);
+
+        expect(req.body).toEqual({ key: 'value' });
+        expect(next).toHaveBeenCalled();
+    });
 });

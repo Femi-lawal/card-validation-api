@@ -1,18 +1,18 @@
-// src/api/controllers/card.controller.test.js
+// tests/api/controllers/card.controller.test.js
 
 import { validatePayment } from '../../../src/api/controllers/card.controller';
-import utils from '../../../utils';
-import services from '../../../src/services';
+import utils from '../../../src/utils';
+import services from '../../../src/api/services';
 
 const { utilityResponse } = utils;
 const { cardIssuer, cvv2Validator, emailValidator, expiryDateValidator, lunhValidator, phoneNumberValidator } = services;
 
-jest.mock('../../../utils', () => ({
+jest.mock('../../../src/utils', () => ({
   utilityResponse: jest.fn(),
   errorCodesGenerator: jest.fn()
 }));
 
-jest.mock('../../../src/services', () => ({
+jest.mock('../../../src/api/services', () => ({
   cardIssuer: jest.fn(),
   cvv2Validator: jest.fn(),
   emailValidator: jest.fn(),
@@ -76,7 +76,8 @@ describe('validatePayment Controller', () => {
       errorCodes,
       data: { issuer: 'visa' },
       res,
-      isXml: false
+      isXml: false,
+      statusCode: 200
     });
 
     expect(res.status).toHaveBeenCalledWith(200);
@@ -102,7 +103,8 @@ describe('validatePayment Controller', () => {
       errorCodes,
       data: { issuer: 'visa' },
       res,
-      isXml: false
+      isXml: false,
+      statusCode: 400
     });
 
     expect(res.status).toHaveBeenCalledWith(400);
@@ -117,7 +119,7 @@ describe('validatePayment Controller', () => {
     validatePayment(req, res, next);
 
     expect(utilityResponse).toHaveBeenCalledWith({
-      errorCodes: mockError.message,
+      errorCodes: ['An unexpected error occurred. Please try again.'],
       res,
       statusCode: 500
     });

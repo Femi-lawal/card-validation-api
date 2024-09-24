@@ -5,7 +5,12 @@ export default (jsonObject) => {
         // Create a properly structured object for XML conversion
         const newObject = {
             root: {
-                valid: jsonObject.valid,
+                valid: {
+                    isValid: jsonObject.valid
+                },
+                issuer: {
+                    issuer: jsonObject.issuer
+                },
                 errorCodes: {
                     code: jsonObject.errorCodes // Assumes errorCodes is an array of strings
                 }
