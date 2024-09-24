@@ -11,7 +11,7 @@ const {
 } = services;
 const { errorCodesGenerator, utilityResponse } = utils;
 
-const validatePayment = (req, res) => {
+const validateCard = (req, res) => {
     try {
         // Extract and validate request body
         const { creditCardNumber = '', expirationDate, cvv2, email, phoneNumber, isXml } = req.body;
@@ -44,4 +44,4 @@ const validatePayment = (req, res) => {
     }
 };
 
-export { validatePayment };
+export { validateCard };

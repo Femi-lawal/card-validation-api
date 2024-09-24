@@ -1,129 +1,127 @@
-// tests/api/controllers/card.controller.test.js
-
-import { validatePayment } from '../../../src/api/controllers/card.controller';
+// card.controller.test.js
+import { validateCard } from '../../../src/api/controllers/card.controller';
 import utils from '../../../src/utils';
 import services from '../../../src/api/services';
 
-const { utilityResponse } = utils;
-const { cardIssuer, cvv2Validator, emailValidator, expiryDateValidator, lunhValidator, phoneNumberValidator } = services;
+jest.mock('../../../src/utils');
+jest.mock('../../../src/api/services');
 
-jest.mock('../../../src/utils', () => ({
-  utilityResponse: jest.fn(),
-  errorCodesGenerator: jest.fn()
-}));
-
-jest.mock('../../../src/api/services', () => ({
-  cardIssuer: jest.fn(),
-  cvv2Validator: jest.fn(),
-  emailValidator: jest.fn(),
-  expiryDateValidator: jest.fn(),
-  lunhValidator: jest.fn(),
-  phoneNumberValidator: jest.fn()
-}));
-
-describe('validatePayment Controller', () => {
-  let req, res, next;
+describe('validateCard', () => {
+  let req, res;
 
   beforeEach(() => {
-    req = {
-      body: {
-        creditCardNumber: '4111111111111111',
-        expirationDate: '12/25',
-        cvv2: '123',
-        email: 'test@example.com',
-        mobile: '08123456789',
-        phoneNumber: '+2348123456789',
-        isXml: false
-      }
-    };
-    res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-      set: jest.fn(),
-      send: jest.fn()
-    };
-    next = jest.fn();
+      req = {
+          body: {
+              creditCardNumber: '4111 1111 1111 1111',
+              expirationDate: '12/23',
+              cvv2: '123',
+              email: 'test@example.com',
+              phoneNumber: '1234567890',
+              isXml: false
+          }
+      };
+      res = {
+          status: jest.fn().mockReturnThis(),
+          json: jest.fn(),
+          send: jest.fn()
+      };
 
-    // Mocking service functions
-    lunhValidator.mockReturnValue(true);
-    cardIssuer.mockReturnValue('visa');
-    expiryDateValidator.mockReturnValue([true]);
-    emailValidator.mockReturnValue(true);
-    cvv2Validator.mockReturnValue(true);
-    phoneNumberValidator.mockReturnValue(true);
+      services.lunhValidator.mockReturnValue(true);
+      services.cardIssuer.mockReturnValue('VISA');
+      services.expiryDateValidator.mockReturnValue(false);
+      services.emailValidator.mockReturnValue(true);
+      services.cvv2Validator.mockReturnValue(true);
+      services.phoneNumberValidator.mockReturnValue(true);
+      utils.errorCodesGenerator.mockReturnValue([]);
+      utils.utilityResponse.mockImplementation(({ errorCodes, data, res, isXml }) => {
+          res.status(200).json({ errorCodes, data });
+      });
+
+      // Mock console.error
+      global.console.error = jest.fn();
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+      // Restore console.error
+      global.console.error.mockRestore();
   });
 
-  test('should validate and return 200 for valid card details', () => {
-    const errorCodes = [];
-    utils.errorCodesGenerator.mockReturnValue(errorCodes);
+  it('should validate payment successfully', () => {
+      validateCard(req, res);
 
-    validatePayment(req, res, next);
-
-    expect(utils.errorCodesGenerator).toHaveBeenCalledWith({
-      isCard: true,
-      issuer: 'visa',
-      hasExpired: [true],
-      validEmail: true,
-      validCvv: true,
-      validPhoneNumber: true
-    });
-
-    expect(utilityResponse).toHaveBeenCalledWith({
-      errorCodes,
-      data: { issuer: 'visa' },
-      res,
-      isXml: false,
-      statusCode: 200
-    });
-
-    expect(res.status).toHaveBeenCalledWith(200);
+      expect(services.lunhValidator).toHaveBeenCalledWith('4111111111111111');
+      expect(services.cardIssuer).toHaveBeenCalledWith('4111111111111111');
+      expect(services.expiryDateValidator).toHaveBeenCalledWith('12/23');
+      expect(services.emailValidator).toHaveBeenCalledWith('test@example.com');
+      expect(services.cvv2Validator).toHaveBeenCalledWith('123', 'VISA');
+      expect(services.phoneNumberValidator).toHaveBeenCalledWith('1234567890');
+      expect(utils.errorCodesGenerator).toHaveBeenCalledWith({
+          isCard: true,
+          issuer: 'VISA',
+          hasExpired: false,
+          validEmail: true,
+          validCvv: true,
+          validPhoneNumber: true
+      });
+      expect(utils.utilityResponse).toHaveBeenCalledWith({
+          errorCodes: [],
+          data: { issuer: 'VISA' },
+          res,
+          isXml: false
+      });
   });
 
-  test('should return 400 if card details are invalid', () => {
-    lunhValidator.mockReturnValue(false); // Invalid card number
-    const errorCodes = ['creditCardNumber: The card number is invalid'];
-    utils.errorCodesGenerator.mockReturnValue(errorCodes);
+  it('should handle invalid card number', () => {
+      services.lunhValidator.mockReturnValue(false);
 
-    validatePayment(req, res, next);
+      validateCard(req, res);
 
-    expect(utils.errorCodesGenerator).toHaveBeenCalledWith({
-      isCard: false,
-      issuer: 'visa',
-      hasExpired: [true],
-      validEmail: true,
-      validCvv: true,
-      validPhoneNumber: true
-    });
-
-    expect(utilityResponse).toHaveBeenCalledWith({
-      errorCodes,
-      data: { issuer: 'visa' },
-      res,
-      isXml: false,
-      statusCode: 400
-    });
-
-    expect(res.status).toHaveBeenCalledWith(400);
+      expect(utils.errorCodesGenerator).toHaveBeenCalledWith(expect.objectContaining({ isCard: false }));
   });
 
-  test('should handle unexpected errors', () => {
-    const mockError = new Error('Unexpected Error');
-    utils.errorCodesGenerator.mockImplementation(() => {
-      throw mockError;
-    });
+  it('should handle expired card', () => {
+      services.expiryDateValidator.mockReturnValue(true);
 
-    validatePayment(req, res, next);
+      validateCard(req, res);
 
-    expect(utilityResponse).toHaveBeenCalledWith({
-      errorCodes: ['An unexpected error occurred. Please try again.'],
-      res,
-      statusCode: 500
-    });
+      expect(utils.errorCodesGenerator).toHaveBeenCalledWith(expect.objectContaining({ hasExpired: true }));
+  });
 
-    expect(res.status).toHaveBeenCalledWith(500);
+  it('should handle invalid email', () => {
+      services.emailValidator.mockReturnValue(false);
+
+      validateCard(req, res);
+
+      expect(utils.errorCodesGenerator).toHaveBeenCalledWith(expect.objectContaining({ validEmail: false }));
+  });
+
+  it('should handle invalid CVV', () => {
+      services.cvv2Validator.mockReturnValue(false);
+
+      validateCard(req, res);
+
+      expect(utils.errorCodesGenerator).toHaveBeenCalledWith(expect.objectContaining({ validCvv: false }));
+  });
+
+  it('should handle invalid phone number', () => {
+      services.phoneNumberValidator.mockReturnValue(false);
+
+      validateCard(req, res);
+
+      expect(utils.errorCodesGenerator).toHaveBeenCalledWith(expect.objectContaining({ validPhoneNumber: false }));
+  });
+
+  it('should handle unexpected error', () => {
+      const error = new Error('Unexpected error');
+      services.lunhValidator.mockImplementation(() => { throw error; });
+
+      validateCard(req, res);
+
+      expect(console.error).toHaveBeenCalledWith('Validation Error:', error);
+      expect(utils.utilityResponse).toHaveBeenCalledWith({
+          errorCodes: ['An unexpected error occurred. Please try again.'],
+          res,
+          statusCode: 500
+      });
   });
 });

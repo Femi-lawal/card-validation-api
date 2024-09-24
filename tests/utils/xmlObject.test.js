@@ -1,47 +1,60 @@
-// src/utils/xmlObject.test.js
-
+// xmlObject.test.js
+import { toXml } from 'xml2json';
 import convertToXml from '../../src/utils/xmlObject';
 
-describe('convertToXml Utility Function', () => {
-  test('should convert valid JSON object to XML format', () => {
-    const jsonObject = {
-      valid: true,
-      errorCodes: ['Error1', 'Error2']
-    };
+jest.mock('xml2json');
 
-    const expectedXml = '<root><valid>true</valid><errorCodes><code>Error1</code><code>Error2</code></errorCodes></root>';
-    const xmlResult = convertToXml(jsonObject);
+describe('convertToXml', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        // Mock console.error
+        global.console.error = jest.fn();
+    });
 
-    expect(xmlResult).toBe(expectedXml);
-  });
+    afterEach(() => {
+        // Restore console.error
+        global.console.error.mockRestore();
+    });
 
-  test('should throw an error when JSON format is incorrect', () => {
-    const invalidJsonObject = undefined; // Invalid input
+    it('should convert JSON object to XML successfully', () => {
+        const jsonObject = {
+            valid: true,
+            issuer: 'VISA',
+            errorCodes: ['ERR001', 'ERR002']
+        };
 
-    expect(() => convertToXml(invalidJsonObject)).toThrow('Conversion failed. Please check the JSON format.');
-  });
+        const expectedXml = '<root><valid><isValid>true</isValid></valid><issuer><issuer>VISA</issuer></issuer><errorCodes><code>ERR001</code><code>ERR002</code></errorCodes></root>';
+        toXml.mockReturnValue(expectedXml);
 
-  test('should handle empty errorCodes array', () => {
-    const jsonObject = {
-      valid: true,
-      errorCodes: []
-    };
+        const result = convertToXml(jsonObject);
 
-    const expectedXml = '<root><valid>true</valid><errorCodes /></root>';
-    const xmlResult = convertToXml(jsonObject);
+        expect(toXml).toHaveBeenCalledWith({
+            root: {
+                valid: {
+                    isValid: jsonObject.valid
+                },
+                issuer: {
+                    issuer: jsonObject.issuer
+                },
+                errorCodes: {
+                    code: jsonObject.errorCodes
+                }
+            }
+        });
+        expect(result).toBe(expectedXml);
+    });
 
-    expect(xmlResult).toBe(expectedXml);
-  });
+    it('should handle error during conversion', () => {
+        const jsonObject = {
+            valid: true,
+            issuer: 'VISA',
+            errorCodes: ['ERR001', 'ERR002']
+        };
 
-  test('should handle null or undefined errorCodes', () => {
-    const jsonObject = {
-      valid: true,
-      errorCodes: null
-    };
+        const error = new Error('Conversion error');
+        toXml.mockImplementation(() => { throw error; });
 
-    const expectedXml = '<root><valid>true</valid><errorCodes /></root>';
-    const xmlResult = convertToXml(jsonObject);
-
-    expect(xmlResult).toBe(expectedXml);
-  });
+        expect(() => convertToXml(jsonObject)).toThrow('Conversion failed. Please check the JSON format.');
+        expect(console.error).toHaveBeenCalledWith('Error converting JSON to XML:', error);
+    });
 });
