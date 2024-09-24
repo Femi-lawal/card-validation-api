@@ -2,4 +2,4 @@ build
 node_modules
 .env
 .vscode
-error.log
+*error.log
