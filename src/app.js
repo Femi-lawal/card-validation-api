@@ -11,7 +11,7 @@ import healthRoutes from './api/routes/health.routes'; // Separate health-check 
 const app = express();
 
 // Use morgan only in development
-if (process.env.NODE_ENV === 'development') {
+if (process.env.ENABLE_LOGGING === 'true') {
     app.use(morgan('dev'));
 }
 
