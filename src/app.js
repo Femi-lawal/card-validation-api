@@ -27,6 +27,7 @@ app.use(xmlparser({
 app.use(authorize);
 
 // Health-check route
+// Health-check route for monitoring and load balancing
 app.use('/health-check', healthRoutes);
 
 // API routes
