@@ -36,6 +36,7 @@ app.use('/api', routes);
 app.use((_req, res) => res.status(404).send({ error: 'Page not found' }));
 
 // Centralized error handling middleware
+// Centralized error handling middleware (should be last in the middleware stack)
 app.use(errorHandler);
 
 export default app;
