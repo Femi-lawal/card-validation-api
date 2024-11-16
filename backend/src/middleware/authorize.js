@@ -1,0 +1,15 @@
+const authorize = (req, res, next) => {
+  const token = req.headers['token'];
+  const client = req.headers['client'];
+
+  const validToken = process.env.ACCESS_TOKEN || '8234d078-e3ab-479e-a20e-89eb4dd0133f';
+  const validClient = process.env.CLIENT || '3W6izon01E77goCGve8pHA';
+
+  if (token === validToken && client === validClient) {
+    return next();
+  }
+
+  res.status(401).json({ success: false, message: 'Unauthorized' });
+};
+
+module.exports = authorize;
