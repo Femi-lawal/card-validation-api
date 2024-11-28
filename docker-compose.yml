@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: card-validation-api-backend-1
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      - ACCESS_TOKEN=8234d078-e3ab-479e-a20e-89eb4dd0133f
+      - CLIENT=3W6izon01E77goCGve8pHA
+      - ENABLE_LOGGING=true
+      - MONGODB_URI=mongodb://admin:admin123@mongodb:27017/card-validation?authSource=admin
+    depends_on:
+      - mongodb
+
+  frontend:
+    build: ./frontend
+    container_name: card-validation-api-frontend-1
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - BACKEND_URL=http://backend:5000
+      - CARD_VALIDATION_TOKEN=8234d078-e3ab-479e-a20e-89eb4dd0133f
+      - CARD_VALIDATION_CLIENT=3W6izon01E77goCGve8pHA
+
+  mongodb:
+    image: mongo:7-jammy
+    container_name: card-validation-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+    volumes:
+      - mongodb_data:/data/db
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: card-validation-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=admin123
+      - ME_CONFIG_MONGODB_URL=mongodb://admin:admin123@mongodb:27017/
+    depends_on:
+      - mongodb
+
+volumes:
+  mongodb_data:
