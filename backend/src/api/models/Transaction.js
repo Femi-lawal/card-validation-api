@@ -45,8 +45,28 @@ const transactionSchema = new mongoose.Schema({
     type: String,
     enum: ['low', 'medium', 'high'],
   },
-  email: String, // Stored encrypted
-  phoneNumber: String, // Stored encrypted
+  email: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        // Must be encrypted in hex format: iv:authTag:ciphertext
+        return !v || /^[a-f0-9]+:[a-f0-9]+:[a-f0-9]+$/.test(v);
+      },
+      message: 'email must be encrypted in iv:authTag:ciphertext format'
+    },
+    select: false, // Exclude from queries by default
+  },
+  phoneNumber: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        // Must be encrypted in hex format: iv:authTag:ciphertext
+        return !v || /^[a-f0-9]+:[a-f0-9]+:[a-f0-9]+$/.test(v);
+      },
+      message: 'phoneNumber must be encrypted in iv:authTag:ciphertext format'
+    },
+    select: false, // Exclude from queries by default
+  },
   cardholderName: String,
   createdAt: {
     type: Date,

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { WEBHOOK_EVENT_VALUES } = require('../../constants/webhooks');
 
 const webhookConfigSchema = new mongoose.Schema({
   url: {
@@ -19,7 +20,7 @@ const webhookConfigSchema = new mongoose.Schema({
   events: {
     type: [{
       type: String,
-      enum: ['payment.succeeded', 'payment.failed', 'payment.refunded'],
+      enum: WEBHOOK_EVENT_VALUES,
     }],
     required: true,
     validate: {
@@ -32,14 +33,11 @@ const webhookConfigSchema = new mongoose.Schema({
   secret: {
     type: String,
     required: true,
+    select: false, // Exclude from queries to prevent exposure
   },
   active: {
     type: Boolean,
     default: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
   },
 }, {
   timestamps: true,

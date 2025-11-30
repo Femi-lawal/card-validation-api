@@ -5,6 +5,7 @@ const { body } = require('express-validator');
 const WebhookConfig = require('../models/WebhookConfig');
 const validate = require('../../middleware/validate');
 const authorize = require('../../middleware/authorize');
+const { WEBHOOK_EVENT_VALUES } = require('../../constants/webhooks');
 
 router.post(
   '/configure',
@@ -12,7 +13,7 @@ router.post(
   [
     body('url').isURL({ protocols: ['http', 'https'], require_protocol: true }).withMessage('Valid HTTP/HTTPS URL required'),
     body('events').isArray({ min: 1 }).withMessage('At least one event must be specified'),
-    body('events.*').isIn(['payment.succeeded', 'payment.failed', 'payment.refunded']).withMessage('Invalid event type'),
+    body('events.*').isIn(WEBHOOK_EVENT_VALUES).withMessage('Invalid event type'),
     validate,
   ],
   async (req, res) => {
