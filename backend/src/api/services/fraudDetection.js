@@ -17,10 +17,6 @@ const calculateRiskScore = (transactionData) => {
     riskScore = 0; // Test cards have no risk
   }
 
-  // Simulated country-based risk
-  const highRiskCountries = ['NG', 'RU', 'CN'];
-  const phoneCountryCode = transactionData.phoneNumber?.substring(0, 3);
-  if (highRiskCountries.includes(phoneCountryCode)) riskScore += 25;
 
   return Math.min(riskScore, 100);
 };
