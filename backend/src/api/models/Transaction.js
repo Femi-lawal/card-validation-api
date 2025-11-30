@@ -9,8 +9,8 @@ const transactionSchema = new mongoose.Schema({
   },
   idempotencyKey: {
     type: String,
+    unique: true,
     sparse: true,
-    index: true,
   },
   cardNumber: {
     type: String,
