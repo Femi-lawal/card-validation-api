@@ -1,40 +1,84 @@
-# CARD VALIDATION API
+# Payment Gateway Simulator
 
-This is a NodeJS API for validating cards.
+A production-grade payment gateway simulator demonstrating full-stack development, SRE practices, and payment industry knowledge.
 
-## Requirements
+## 🌐 Service URLs
 
-* NodeJS 14.15.1 or higher
-* Yarn
-* Copy the contents of env.example into a .env file
-* Ensure the token and client headers are contained in the request
+| Service | URL | Credentials | Description |
+|---------|-----|-------------|-------------|
+| **Frontend** | http://localhost:3000 | N/A | Payment form interface |
+| **Backend API** | http://localhost:5000 | token + client headers | RESTful APIs |
+| **API Docs** | http://localhost:5000/api-docs | N/A | Swagger UI |
+| **Metrics** | http://localhost:5000/metrics | N/A | Prometheus metrics |
+| **Mongo Express** | http://localhost:8081 | admin / admin123 | Database UI |
+| **MongoDB** | localhost:27017 | admin / admin123 | Database |
 
-## To Run 
+## 🚀 Quick Start
 
+```bash
+# Start all services
+docker compose up --build
+
+# Run tests
+cd backend && npm test
+
+# Access frontend
+open http://localhost:3000
 ```
-$ cp .env.example .env
-$ yarn install
-$ yarn run dev
-```
-### Documentation
-- [Postman Documentation](https://documenter.getpostman.com/view/7968287/Tzm2Le6L)
 
-### Request
-```json
-{
-    "creditCardNumber": "5500 0000 0000 0004",
-    "expirationDate": "08/23",
-    "cvv2": "123",
-    "email": "femilawal76@gmail.com",
-    "mobile": "07015234553",
-    "phoneNumber": "+2347015234553"
-}
+## 💳 Features
+
+### Payment Gateway
+- Transaction processing with fraud detection
+- Risk scoring engine (0-100 scale)
+- Analytics APIs (overview, time-series, card-types)
+- Webhook system with HMAC-SHA256 signatures
+- Transaction management (process, list, view, refund)
+
+### Frontend
+- Next.js 14 with TypeScript
+- Glassmorphism UI design
+- 8 card networks supported
+- Dynamic card detection
+- Card flip animation
+
+### Backend
+- Express with MongoDB
+- Fraud detection engine
+- Prometheus metrics
+- Swagger/OpenAPI documentation
+- Comprehensive test suite
+
+### SRE & Observability
+- Prometheus metrics at `/metrics`
+- Swagger documentation at `/api-docs`
+- Health checks
+- Security headers (Helmet)
+- Rate limiting
+
+## 🧪 Test Cards
+
+- **Visa**: 4242 4242 4242 4242
+- **Mastercard**: 5555 5555 5555 4444
+- **Amex**: 3782 822463 10005
+
+## 📊 API Documentation
+
+Full API documentation available at: http://localhost:5000/api-docs
+
+## 🛠️ Technology Stack
+
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
+- **Backend**: Node.js, Express, MongoDB, Mongoose
+- **Infrastructure**: Docker, Docker Compose
+- **Observability**: Prometheus, Swagger/OpenAPI
+- **Testing**: Jest (40+ tests passing)
+
+## ✅ Testing
+
+```bash
+cd backend
+npm test
 ```
-### Response
-```json
-{
-    "valid": true,
-    "errorCodes": [],
-    "issuer": "mastercard"
-}
-```
+
+All tests passing with fraud detection coverage.

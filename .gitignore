@@ -1,5 +1,11 @@
 build
 node_modules
+.DS_Store
 .env
+
+# Test coverage
+coverage/
+*.lcov
+.nyc_output/
 .vscode
 *error.log
