@@ -44,13 +44,15 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Request timing
+// Request timing and metrics
 app.use((req, res, next) => {
   const start = Date.now();
   res.on('finish', () => {
     const duration = (Date.now() - start) / 1000;
-    httpRequestCounter.inc({ method: req.method, route: req.path, status_code: res.statusCode });
-    httpRequestDuration.observe({ method: req.method, route: req.path, status_code: res.statusCode }, duration);
+    // Use route path to avoid unbounded cardinality from dynamic path segments
+    const route = req.route?.path || req.path;
+    httpRequestCounter.inc({ method: req.method, route, status_code: res.statusCode });
+    httpRequestDuration.observe({ method: req.method, route, status_code: res.statusCode }, duration);
   });
   next();
 });

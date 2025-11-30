@@ -24,7 +24,8 @@ router.post('/configure', async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Webhook configuration error:', error);
+    res.status(500).json({ success: false, message: 'Failed to configure webhook' });
   }
 });
 

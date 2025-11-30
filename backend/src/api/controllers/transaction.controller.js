@@ -3,10 +3,33 @@ const Transaction = require('../models/Transaction');
 const { calculateRiskScore, getRiskLevel, shouldDeclineTransaction } = require('../services/fraudDetection');
 const { getCardIssuer } = require('../services/cardIssuer');
 const { sendWebhook } = require('../services/webhookService');
+const { encryptPII } = require('../../utils/encryption');
 
 const processPayment = async (req, res) => {
   try {
-    const { cardNumber, expirationDate, cvv2, email, phoneNumber, cardholderName, amount = 100, currency = 'USD' } = req.body;
+    const { cardNumber, expirationDate, cvv2, email, phoneNumber, cardholderName, amount = 100, currency = 'USD', idempotencyKey } = req.body;
+
+    // Check for existing transaction with same idempotency key
+    if (idempotencyKey) {
+      const existingTransaction = await Transaction.findOne({
+        idempotencyKey,
+        createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } // 24 hour window
+      });
+
+      if (existingTransaction) {
+        // Return the existing transaction instead of creating a new one
+        return res.json({
+          success: existingTransaction.status === 'succeeded',
+          transactionId: existingTransaction.transactionId,
+          amount: existingTransaction.amount,
+          currency: existingTransaction.currency,
+          status: existingTransaction.status,
+          riskScore: existingTransaction.riskScore,
+          riskLevel: existingTransaction.riskLevel,
+          cardType: existingTransaction.cardType,
+        });
+      }
+    }
 
     const riskScore = calculateRiskScore({ cardNumber, email, phoneNumber, amount });
     const riskLevel = getRiskLevel(riskScore);
@@ -18,6 +41,7 @@ const processPayment = async (req, res) => {
 
     const transaction = await Transaction.create({
       transactionId,
+      idempotencyKey,
       cardNumber: cardNumber.substring(0, 6) + '******' + cardNumber.slice(-4),
       cardType,
       amount,
@@ -25,8 +49,8 @@ const processPayment = async (req, res) => {
       status,
       riskScore,
       riskLevel,
-      email,
-      phoneNumber,
+      email: encryptPII(email),
+      phoneNumber: encryptPII(phoneNumber),
       cardholderName,
     });
 
@@ -54,7 +78,8 @@ const processPayment = async (req, res) => {
       cardType,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Payment processing error:', error);
+    res.status(500).json({ success: false, message: 'Payment processing failed' });
   }
 };
 
@@ -75,7 +100,8 @@ const getTransactions = async (req, res) => {
       total: count,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Get transactions error:', error);
+    res.status(500).json({ success: false, message: 'Failed to retrieve transactions' });
   }
 };
 
@@ -87,7 +113,8 @@ const getTransaction = async (req, res) => {
     }
     res.json(transaction);
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Get transaction error:', error);
+    res.status(500).json({ success: false, message: 'Failed to retrieve transaction' });
   }
 };
 
@@ -110,7 +137,8 @@ const refundTransaction = async (req, res) => {
 
     res.json({ success: true, message: 'Transaction refunded', transaction });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Refund transaction error:', error);
+    res.status(500).json({ success: false, message: 'Failed to refund transaction' });
   }
 };
 

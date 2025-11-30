@@ -3,6 +3,14 @@ const { validateLuhn, getCardIssuer, validateEmail, validateCVV2, validateExpiry
 const validateCard = (req, res) => {
   const { cardNumber, expirationDate, cvv2, email, phoneNumber } = req.body;
 
+  // Check for required fields
+  if (!cardNumber || !expirationDate || !cvv2 || !email || !phoneNumber) {
+    return res.status(400).json({
+      success: false,
+      errors: ['Missing required fields: cardNumber, expirationDate, cvv2, email, phoneNumber']
+    });
+  }
+
   const errors = [];
 
   if (!validateLuhn(cardNumber)) errors.push('Invalid card number');
@@ -11,7 +19,13 @@ const validateCard = (req, res) => {
   if (!validatePhoneNumber(phoneNumber)) errors.push('Invalid phone number');
 
   const cardType = getCardIssuer(cardNumber);
-  if (!validateCVV2(cvv2, cardType)) errors.push('Invalid CVV');
+
+  // Explicitly reject unknown card types
+  if (cardType === 'unknown') {
+    errors.push('Unsupported card type');
+  } else if (!validateCVV2(cvv2, cardType)) {
+    errors.push('Invalid CVV');
+  }
 
   if (errors.length > 0) {
     return res.status(400).json({ success: false, errors });

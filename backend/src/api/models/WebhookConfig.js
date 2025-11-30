@@ -4,6 +4,17 @@ const webhookConfigSchema = new mongoose.Schema({
   url: {
     type: String,
     required: true,
+    validate: {
+      validator: function (v) {
+        try {
+          const parsed = new URL(v);
+          return ['http:', 'https:'].includes(parsed.protocol);
+        } catch {
+          return false;
+        }
+      },
+      message: 'URL must be a valid HTTP or HTTPS URL'
+    }
   },
   events: [{
     type: String,

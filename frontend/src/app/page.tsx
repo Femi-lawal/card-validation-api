@@ -31,6 +31,7 @@ export default function Home() {
     amount: '100',
   });
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isShaking, setIsShaking] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -68,10 +69,8 @@ export default function Home() {
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
       } else {
         setError(data.message || 'Payment failed');
-        document.querySelector('.card-container')?.classList.add('shake');
-        setTimeout(() => {
-          document.querySelector('.card-container')?.classList.remove('shake');
-        }, 500);
+        setIsShaking(true);
+        setTimeout(() => setIsShaking(false), 500);
       }
     } catch (err) {
       setError('Network error occurred');
@@ -98,7 +97,7 @@ export default function Home() {
         <h1 className="text-4xl font-bold text-center mb-8 text-white">Payment Gateway</h1>
 
         {/* Card Display */}
-        <div className={`card-container mb-8 perspective-1000 ${isFlipped ? 'flipped' : ''}`}>
+        <div className={`card-container mb-8 perspective-1000 ${isFlipped ? 'flipped' : ''} ${isShaking ? 'shake' : ''}`}>
           <div className="card-flip w-full h-56 relative" style={{ transformStyle: 'preserve-3d' }}>
             <div
               className="absolute w-full h-full rounded-2xl p-6 flex flex-col justify-between"
@@ -142,7 +141,7 @@ export default function Home() {
             className="w-full bg-white bg-opacity-20 text-white placeholder-gray-300 px-4 py-3 rounded-lg"
             required
           />
-          
+
           <div className="grid grid-cols-2 gap-4">
             <input
               type="text"

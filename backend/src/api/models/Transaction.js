@@ -7,6 +7,11 @@ const transactionSchema = new mongoose.Schema({
     unique: true,
     index: true,
   },
+  idempotencyKey: {
+    type: String,
+    sparse: true,
+    index: true,
+  },
   cardNumber: String,
   cardType: String,
   amount: {
@@ -31,8 +36,8 @@ const transactionSchema = new mongoose.Schema({
     type: String,
     enum: ['low', 'medium', 'high'],
   },
-  email: String,
-  phoneNumber: String,
+  email: String, // Stored encrypted
+  phoneNumber: String, // Stored encrypted
   cardholderName: String,
   createdAt: {
     type: Date,
