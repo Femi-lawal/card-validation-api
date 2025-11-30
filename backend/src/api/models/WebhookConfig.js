@@ -16,10 +16,19 @@ const webhookConfigSchema = new mongoose.Schema({
       message: 'URL must be a valid HTTP or HTTPS URL'
     }
   },
-  events: [{
-    type: String,
-    enum: ['payment.succeeded', 'payment.failed', 'payment.refunded'],
-  }],
+  events: {
+    type: [{
+      type: String,
+      enum: ['payment.succeeded', 'payment.failed', 'payment.refunded'],
+    }],
+    required: true,
+    validate: {
+      validator: function (v) {
+        return v && v.length > 0;
+      },
+      message: 'At least one event must be specified'
+    }
+  },
   secret: {
     type: String,
     required: true,
@@ -32,6 +41,8 @@ const webhookConfigSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+}, {
+  timestamps: true,
 });
 
 module.exports = mongoose.model('WebhookConfig', webhookConfigSchema);

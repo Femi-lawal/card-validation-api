@@ -24,10 +24,16 @@ const authorize = (req, res, next) => {
   const token = req.headers['token'];
   const client = req.headers['client'];
 
-  const validToken = process.env.ACCESS_TOKEN || '8234d078-e3ab-479e-a20e-89eb4dd0133f';
-  const validClient = process.env.CLIENT || '3W6izon01E77goCGve8pHA';
+  const validToken = process.env.ACCESS_TOKEN;
+  const validClient = process.env.CLIENT;
+
+  if (!validToken || !validClient) {
+    console.error('ACCESS_TOKEN and CLIENT environment variables must be set');
+    return res.status(500).json({ success: false, message: 'Server configuration error' });
+  }
 
   if (token === validToken && client === validClient) {
+    console.warn('DEPRECATED: Legacy token/client authentication used. Please migrate to JWT Bearer tokens.');
     return next();
   }
 

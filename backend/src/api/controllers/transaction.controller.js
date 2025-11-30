@@ -39,10 +39,19 @@ const processPayment = async (req, res) => {
     const cardType = getCardIssuer(cardNumber);
     const status = shouldDecline ? 'failed' : 'succeeded';
 
+    // Validate and clean card number before masking
+    if (!cardNumber) {
+      return res.status(400).json({ success: false, message: 'Card number is required' });
+    }
+    const cleanedCardNumber = cardNumber.replace(/\s/g, '');
+    if (cleanedCardNumber.length < 13 || cleanedCardNumber.length > 19) {
+      return res.status(400).json({ success: false, message: 'Invalid card number length' });
+    }
+
     const transaction = await Transaction.create({
       transactionId,
       idempotencyKey,
-      cardNumber: cardNumber.substring(0, 6) + '******' + cardNumber.slice(-4),
+      cardNumber: cleanedCardNumber.substring(0, 6) + '******' + cleanedCardNumber.slice(-4),
       cardType,
       amount,
       currency,
@@ -120,18 +129,27 @@ const getTransaction = async (req, res) => {
 
 const refundTransaction = async (req, res) => {
   try {
-    const transaction = await Transaction.findOne({ transactionId: req.params.id });
+    // Atomic update: only refund if status is 'succeeded'
+    const transaction = await Transaction.findOneAndUpdate(
+      {
+        transactionId: req.params.id,
+        status: 'succeeded' // Only update if still in succeeded state
+      },
+      {
+        status: 'refunded',
+        refundedAt: new Date()
+      },
+      { new: true } // Return updated document
+    );
+
     if (!transaction) {
-      return res.status(404).json({ success: false, message: 'Transaction not found' });
+      // Could be not found or already refunded
+      const existingTransaction = await Transaction.findOne({ transactionId: req.params.id });
+      if (!existingTransaction) {
+        return res.status(404).json({ success: false, message: 'Transaction not found' });
+      }
+      return res.status(400).json({ success: false, message: 'Transaction already refunded or not refundable' });
     }
-
-    if (transaction.status !== 'succeeded') {
-      return res.status(400).json({ success: false, message: 'Only successful transactions can be refunded' });
-    }
-
-    transaction.status = 'refunded';
-    transaction.refundedAt = new Date();
-    await transaction.save();
 
     await sendWebhook('payment.refunded', transaction);
 

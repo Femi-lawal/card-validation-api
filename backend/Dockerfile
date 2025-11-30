@@ -6,9 +6,6 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
-
 # Install dependencies (including devDeps for build step)
 RUN npm ci
 
@@ -20,6 +17,8 @@ RUN npm run build
 
 # Runtime stage
 FROM node:18-alpine
+
+ENV NODE_ENV=production
 
 WORKDIR /app
 

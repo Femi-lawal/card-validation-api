@@ -12,7 +12,16 @@ const transactionSchema = new mongoose.Schema({
     sparse: true,
     index: true,
   },
-  cardNumber: String,
+  cardNumber: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        // Ensure format is 6 digits + ****** + 4 digits (or empty/null)
+        return !v || /^\d{6}\*{6}\d{4}$/.test(v);
+      },
+      message: 'cardNumber must be in masked format (XXXXXX******XXXX) or empty'
+    }
+  },
   cardType: String,
   amount: {
     type: Number,
@@ -24,7 +33,7 @@ const transactionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['succeeded', 'failed', 'refunded'],
+    enum: ['pending', 'processing', 'succeeded', 'failed', 'refunded'],
     required: true,
   },
   riskScore: {

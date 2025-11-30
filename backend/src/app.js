@@ -41,6 +41,7 @@ app.use(express.urlencoded({ extended: true }));
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
+  skip: (req) => req.path === '/health-check' || req.path === '/metrics',
 });
 app.use(limiter);
 
@@ -81,7 +82,7 @@ app.get('/metrics', async (req, res) => {
 });
 
 // Health check
-app.get('/health-check', require('./api/controllers/health.controller').healthCheck);
+app.use('/health-check', require('./api/routes/health.routes'));
 
 // Routes
 app.use('/api', authorize, require('./api/routes'));
