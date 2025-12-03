@@ -1,0 +1,9 @@
+{
+    "name": "Payment Gateway Simulator",
+    "short_name": "PaymentGW",
+    "description": "A production-grade payment gateway simulator",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#667eea",
+    "theme_color": "#667eea"
+}
