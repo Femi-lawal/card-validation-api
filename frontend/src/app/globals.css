@@ -389,3 +389,113 @@ input[type="number"] {
   background: rgba(102, 126, 234, 0.5);
   color: white;
 }
+
+/* ==================== LIGHT MODE ==================== */
+.light-mode {
+  background: linear-gradient(135deg, #e0e5ec 0%, #f0f3f7 50%, #ffffff 100%) !important;
+}
+
+.light-mode::before {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 60%, rgba(240, 147, 251, 0.05) 0%, transparent 40%);
+}
+
+.light-mode .orb {
+  opacity: 0.2;
+}
+
+.light-mode h1,
+.light-mode .text-white {
+  color: #1a1a2e !important;
+}
+
+.light-mode .text-white\/70,
+.light-mode .text-white\/60,
+.light-mode .text-white\/50,
+.light-mode .text-white\/40 {
+  color: rgba(26, 26, 46, 0.6) !important;
+}
+
+.light-mode .glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.light-mode .glass-button {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #1a1a2e !important;
+}
+
+.light-mode .input-field {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #1a1a2e;
+}
+
+.light-mode .input-field::placeholder {
+  color: rgba(26, 26, 46, 0.4);
+}
+
+.light-mode .submit-button {
+  box-shadow:
+    0 10px 40px rgba(102, 126, 234, 0.3),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+/* ==================== MODAL ANIMATIONS ==================== */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ==================== PRINT STYLES ==================== */
+@media print {
+  body {
+    background: white !important;
+  }
+
+  .glass-card {
+    background: white !important;
+    box-shadow: none !important;
+    border: 1px solid #e0e0e0 !important;
+  }
+
+  .orb,
+  button,
+  .submit-button {
+    display: none !important;
+  }
+}
+
+/* ==================== SELECT DROPDOWN ==================== */
+select option {
+  background: #1a1a2e;
+  color: white;
+  padding: 10px;
+}
+
+/* ==================== OTP INPUT ==================== */
+input[inputmode="numeric"] {
+  caret-color: transparent;
+}
+
+input[inputmode="numeric"]:focus {
+  caret-color: white;
+}
