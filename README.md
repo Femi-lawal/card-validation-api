@@ -156,6 +156,26 @@ npx playwright test
 npx playwright show-report
 ```
 
+## 🚀 Recent Features (v2.0)
+
+### Security Enhancements
+- **Client-Side Encryption:** Sensitive data is encrypted using AES-256-GCM (simulated) before processing.
+- **3D Secure Simulation:** Authenticate high-value transactions (>$50) with OTP verification.
+
+![Encryption Badge](docs/screenshots/01b-encryption-badge.png)
+*3D Secure OTP Modal*
+![3D Secure Modal](docs/screenshots/03a-3ds-modal.png)
+
+### UX Improvements
+- **Multi-Currency Support:** Pay in USD, EUR, GBP, JPY, or CAD with real-time conversion display.
+- **Transaction Receipts:** Detailed digital receipts with print functionality.
+- **Theme Toggle:** Switch between Dark (Premium) and Light (Standard) modes.
+- **Light Mode:**
+![Light Mode](docs/screenshots/02-light-mode.png)
+
+![Currency Switching](docs/screenshots/05-currency-eur.png)
+![Transaction Receipt](docs/screenshots/03b-payment-success-receipt.png)
+
 ## 📁 Project Structure
 
 ```

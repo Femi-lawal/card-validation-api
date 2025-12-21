@@ -142,6 +142,11 @@ body::before {
   outline: none;
 }
 
+/* Input field with currency prefix - needs extra left padding */
+.input-field.with-currency-prefix {
+  padding-left: 80px !important;
+}
+
 .input-field::placeholder {
   color: rgba(255, 255, 255, 0.4);
 }
@@ -348,11 +353,13 @@ body::before {
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
+  appearance: none;
   margin: 0;
 }
 
 input[type="number"] {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 /* Responsive adjustments */

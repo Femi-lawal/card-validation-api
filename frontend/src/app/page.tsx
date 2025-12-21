@@ -29,28 +29,58 @@ const CARD_NETWORKS = {
     gradient: 'linear-gradient(135deg, #1A1F71 0%, #2E3B8E 50%, #1A1F71 100%)',
     name: 'VISA',
     regex: /^4/,
-    cvvLength: 3
+    cvvLength: 3,
+    logo: (
+      <svg viewBox="0 0 780 500" className="h-8 w-auto">
+        <path fill="#1A1F71" d="M293 348.7l33.4-206.3H377L343.7 348.7h-50.7zm246.8-201.2c-10-3.9-25.8-8.2-45.4-8.2-50.1 0-85.4 26.6-85.7 64.7-.3 28.2 25.2 43.9 44.4 53.3 19.7 9.7 26.3 15.8 26.2 24.4-.1 13.2-15.7 19.2-30.3 19.2-20.2 0-31-3-47.7-10.2l-6.5-3.1-7.1 43.8c11.8 5.5 33.7 10.2 56.5 10.5 53.3 0 87.9-26.3 88.3-66.9.2-22.3-13.3-39.3-42.5-53.3-17.7-9.1-28.5-15.1-28.4-24.3 0-8.1 9.2-16.8 29-16.8 16.5-.3 28.5 3.5 37.8 7.5l4.5 2.3 6.9-42.9zm131.6-5.1h-39.2c-12.1 0-21.2 3.5-26.5 16.3l-75.3 179.9h53.2s8.7-24.2 10.7-29.5l64.9.1c1.5 6.9 6.2 29.4 6.2 29.4h47l-41-196.2zm-62.2 126.7c4.2-11.3 20.3-54.9 20.3-54.9-.3.5 4.2-11.4 6.8-18.8l3.5 17s9.7 47.2 11.8 57.1h-42.4v-.4zm-335.4-126.7l-49.8 141.3-5.3-27.2c-9.2-31.4-38-65.4-70.1-82.5l45.4 171.3h53.6l79.8-202.9h-53.6z" />
+        <path fill="#F9A533" d="M146.9 142.4h-81.8l-.7 4.2c63.6 16.3 105.7 55.6 123.2 102.9l-17.8-90.2c-3-12.3-12-15.9-22.9-16.9z" />
+      </svg>
+    )
   },
   mastercard: {
     color: '#EB001B',
-    gradient: 'linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%)',
+    gradient: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%)',
     name: 'MASTERCARD',
     regex: /^5[1-5]/,
-    cvvLength: 3
+    cvvLength: 3,
+    logo: (
+      <svg viewBox="0 0 152 108" className="h-10 w-auto">
+        <g fill="none">
+          <circle cx="46" cy="54" r="44" fill="#EB001B" />
+          <circle cx="106" cy="54" r="44" fill="#F79E1B" />
+          <path d="M76 24.5c10.6 8.2 17.4 21 17.4 35.5s-6.8 27.3-17.4 35.5c-10.6-8.2-17.4-21-17.4-35.5s6.8-27.3 17.4-35.5z" fill="#FF5F00" />
+        </g>
+      </svg>
+    )
   },
   amex: {
     color: '#006FCF',
-    gradient: 'linear-gradient(135deg, #006FCF 0%, #00A1E4 50%, #006FCF 100%)',
+    gradient: 'linear-gradient(135deg, #006FCF 0%, #0080E0 30%, #006FCF 60%, #005BBB 100%)',
     name: 'AMEX',
     regex: /^3[47]/,
-    cvvLength: 4
+    cvvLength: 4,
+    logo: (
+      <svg viewBox="0 0 160 100" className="h-8 w-auto">
+        <rect fill="#006FCF" width="160" height="100" rx="8" />
+        <text x="80" y="60" textAnchor="middle" fill="white" fontSize="24" fontFamily="Arial Black, sans-serif" fontWeight="bold">AMEX</text>
+        <text x="80" y="78" textAnchor="middle" fill="white" fontSize="10" fontFamily="Arial, sans-serif">AMERICAN EXPRESS</text>
+      </svg>
+    )
   },
   discover: {
     color: '#FF6000',
-    gradient: 'linear-gradient(135deg, #FF6000 0%, #FF8C00 50%, #FF6000 100%)',
+    gradient: 'linear-gradient(135deg, #2A2A2A 0%, #3A3A3A 40%, #FF6000 60%, #FF8C00 100%)',
     name: 'DISCOVER',
     regex: /^6(?:011|5)/,
-    cvvLength: 3
+    cvvLength: 3,
+    logo: (
+      <svg viewBox="0 0 160 100" className="h-8 w-auto">
+        <rect fill="#2A2A2A" width="160" height="100" rx="8" />
+        <path d="M0 50 Q80 0 160 50 Q80 100 0 50" fill="#FF6000" opacity="0.8" />
+        <text x="80" y="58" textAnchor="middle" fill="white" fontSize="18" fontFamily="Arial Black, sans-serif" fontWeight="bold">DISCOVER</text>
+        <circle cx="130" cy="30" r="15" fill="#FF6000" />
+      </svg>
+    )
   },
 };
 
@@ -633,6 +663,7 @@ export default function Home() {
             onClick={() => setDarkMode(!darkMode)}
             className="p-2 rounded-xl bg-white/10 backdrop-blur border border-white/20 hover:bg-white/20 transition"
             title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label="Toggle theme"
           >
             {darkMode ? (
               <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -685,10 +716,11 @@ export default function Home() {
                     {formData.expirationDate || 'MM/YY'}
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-xl font-bold text-white tracking-wider">
-                    {cardNetwork?.name || ''}
-                  </div>
+                {/* Card Logo */}
+                <div className="flex items-end">
+                  {cardNetwork?.logo || (
+                    <div className="text-white/40 text-sm">CARD</div>
+                  )}
                 </div>
               </div>
               <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/5 rounded-2xl pointer-events-none"></div>
@@ -852,7 +884,9 @@ export default function Home() {
 
           {/* Amount with Currency */}
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 font-medium">{currency.symbol}</span>
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-white font-semibold text-sm bg-white/15 px-2.5 py-1.5 rounded-lg border border-white/10">
+              {currency.symbol}
+            </div>
             <input
               type="number"
               placeholder="Amount"
@@ -860,7 +894,7 @@ export default function Home() {
               onChange={(e) => handleInputChange('amount', e.target.value)}
               onFocus={() => setFocusedField('amount')}
               onBlur={() => setFocusedField(null)}
-              className={`input-field pl-8 ${focusedField === 'amount' ? 'ring-2 ring-white/50' : ''} ${validationErrors.amount ? 'ring-2 ring-red-400' : ''}`}
+              className={`input-field with-currency-prefix ${focusedField === 'amount' ? 'ring-2 ring-white/50' : ''} ${validationErrors.amount ? 'ring-2 ring-red-400' : ''}`}
               required
               min="0.01"
               step="0.01"
